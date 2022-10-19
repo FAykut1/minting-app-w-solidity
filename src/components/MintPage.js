@@ -108,7 +108,7 @@ const MintPage = () => {
             <Form.Label>Amount</Form.Label>
             <Form.Control
               type="number"
-              placeholder="Enter NFT name"
+              placeholder="Enter an amount"
               onChange={(e) => setMintAmounts(e.target.value)}
             />
           </Form.Group>

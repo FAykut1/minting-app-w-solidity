@@ -8,7 +8,7 @@ import { hideAccountId } from './utils/util';
 
 function App() {
   const [accounts, setAccounts] = useState([]);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     getCurrentAccounts();
@@ -67,18 +67,31 @@ function App() {
                 <Nav.Link onClick={() => setPage(1)}>Mint</Nav.Link>
               </Nav>
               {accounts.length <= 0 ? (
-                <Navbar.Text onClick={connectAccounts}>Sign in</Navbar.Text>
+                <Nav>
+                  <Nav.Link
+                    className="text-red-800 text-xl font-bold"
+                    onClick={connectAccounts}
+                  >
+                    Sign in
+                  </Nav.Link>
+                </Nav>
               ) : (
-                <Navbar.Text>
-                  Signed in as:{' '}
-                  <a href="#login">{hideAccountId(accounts[0])}</a>
-                </Navbar.Text>
+                <Navbar.Text>{hideAccountId(accounts[0])}</Navbar.Text>
               )}
             </Navbar.Collapse>
           </Container>
         </Navbar>
 
-        <div className="w-3/4 m-auto p-4">{showPage()}</div>
+        <div className="w-3/4 m-auto p-4">
+          {accounts.length <= 0 ? (
+            <span className="font-bold text-3xl text-center text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              You have to connect your account first, top right corner on the
+              screen
+            </span>
+          ) : (
+            showPage()
+          )}
+        </div>
       </main>
     </div>
   );

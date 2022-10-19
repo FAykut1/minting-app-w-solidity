@@ -1,12 +1,10 @@
 import { ethers } from 'ethers';
-import { AbiCoder } from 'ethers/lib/utils';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
+import { useEffect, useState } from 'react';
 import { abi, contractAddress } from '../abi';
 import { storage } from '../utils/db';
-import { getDownloadURL, ref } from 'firebase/storage';
 
-import { Card, Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 
 const NFTPage = () => {
   const [NFTs, setNFTs] = useState([]);
@@ -28,23 +26,15 @@ const NFTPage = () => {
 
         const data = await Promise.all(
           nftArray.map(async (v) => {
-            const src = await getImage(v[1]);
+            const { metadata, src } = await getImage(v[1]);
             return {
               id: v[0],
+              name: metadata.customMetadata.name,
               src,
             };
           })
         );
-        console.log(data);
         setNFTs(data);
-
-        // if (response.length <= 0) return;
-        // const res = ethers.utils.defaultAbiCoder.decode(
-        //   ['string'],
-        //   response[0]
-        // );
-        // console.log(res);
-        console.log('Response ', response);
       } catch (error) {
         console.error(error);
       }
@@ -53,31 +43,36 @@ const NFTPage = () => {
 
   const getImage = async (imageUID) => {
     const imageRef = ref(storage, `images/${imageUID}`);
-    return await getDownloadURL(imageRef);
+    const metadata = await getMetadata(imageRef);
+    const src = await getDownloadURL(imageRef);
+    return {
+      metadata,
+      src,
+    };
   };
 
+  if (NFTs.length === 0) {
+    return (
+      <div className="font-bold text-3xl text-center text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        If you cant see your NFT`s. Please refresh the page.
+      </div>
+    );
+  }
+
   return (
-    <div className="text-white">
+    <div className="text-white grid grid-rows-2 grid-cols-4 gap-2">
       {NFTs.map((v) => (
-        // <div key={v.id} className="p-4 border w-36 h-36">
-        //   <img src={v.src} alt="lol" />
-        // </div>
-        <MCard />
+        <MCard key={v.id} data={v} />
       ))}
     </div>
   );
 };
 
-const MCard = (
-  <Card style={{ width: '18rem' }}>
-    <Card.Img variant="top" src="holder.js/100px180" />
-    <Card.Body>
-      <Card.Title>Card Title</Card.Title>
-      <Card.Text>
-        Some quick example text to build on the card title and make up the bulk
-        of the card's content.
-      </Card.Text>
-      <Button variant="primary">Go somewhere</Button>
+const MCard = ({ data }) => (
+  <Card className="w-56 hover:cursor-pointer hover:w-60 transition-all duration-75 ease-in">
+    <Card.Img variant="top" src={data.src} />
+    <Card.Body className="text-black">
+      <Card.Title>{data.name}</Card.Title>
     </Card.Body>
   </Card>
 );
