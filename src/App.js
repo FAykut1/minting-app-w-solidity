@@ -3,7 +3,7 @@ import './App.css';
 import MintPage from './components/MintPage';
 import NFTPage from './components/NFTPage';
 
-import { Navbar, Container, Nav } from 'react-bootstrap';
+import { Container, Nav, Navbar } from 'react-bootstrap';
 import { hideAccountId } from './utils/util';
 
 function App() {

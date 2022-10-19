@@ -1,57 +1,44 @@
-import { ethers } from 'ethers';
-import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
-import { useEffect, useState } from 'react';
-import { abi, contractAddress } from '../abi';
-import { storage } from '../utils/db';
-
-import { Button, Card } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
+import { useQuery } from 'react-query';
+import { fetchOwnedNFTs } from '../utils/util';
+import Loading from './Loading';
 
 const NFTPage = () => {
-  const [NFTs, setNFTs] = useState([]);
+  const { isLoading, isError, isSuccess, data, error } = useQuery(
+    'myNFTs',
+    fetchOwnedNFTs,
+    { staleTime: 1000 }
+  );
 
-  useEffect(() => {
-    getNFTs();
-  }, []);
+  // const getNFTs = async () => {
+  //   if (window.ethereum) {
+  //     const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //     const signer = provider.getSigner();
+  //     const contract = new ethers.Contract(contractAddress, abi.abi, signer);
 
-  const getNFTs = async () => {
-    if (window.ethereum) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, abi.abi, signer);
+  //     try {
+  //       const response = await contract.getNFTs();
 
-      try {
-        const response = await contract.getNFTs();
+  //       const nftArray = response.map((v) => v.split(','));
 
-        const nftArray = response.map((v) => v.split(','));
+  //       const data = await Promise.all(
+  //         nftArray.map(async (v) => {
+  //           const { metadata, src } = await getImage(v[1]);
+  //           return {
+  //             id: v[0],
+  //             name: metadata.customMetadata.name,
+  //             src,
+  //           };
+  //         })
+  //       );
+  //       setNFTs(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  // };
 
-        const data = await Promise.all(
-          nftArray.map(async (v) => {
-            const { metadata, src } = await getImage(v[1]);
-            return {
-              id: v[0],
-              name: metadata.customMetadata.name,
-              src,
-            };
-          })
-        );
-        setNFTs(data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
-
-  const getImage = async (imageUID) => {
-    const imageRef = ref(storage, `images/${imageUID}`);
-    const metadata = await getMetadata(imageRef);
-    const src = await getDownloadURL(imageRef);
-    return {
-      metadata,
-      src,
-    };
-  };
-
-  if (NFTs.length === 0) {
+  if (data?.length === 0) {
     return (
       <div className="font-bold text-3xl text-center text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         If you cant see your NFT`s. Please refresh the page.
@@ -61,9 +48,11 @@ const NFTPage = () => {
 
   return (
     <div className="text-white grid grid-rows-2 grid-cols-4 gap-2">
-      {NFTs.map((v) => (
+      {data?.map((v) => (
         <MCard key={v.id} data={v} />
       ))}
+
+      <Loading isLoading={isLoading} />
     </div>
   );
 };

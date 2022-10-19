@@ -1,67 +1,26 @@
-import { BigNumber, ethers } from 'ethers';
-import { ref, uploadString } from 'firebase/storage';
-import { useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { abi, contractAddress } from '../abi';
-import { storage } from '../utils/db';
+import { useState } from 'react';
 
-import { Form, Button, Image } from 'react-bootstrap';
+import { Button, Form, Image } from 'react-bootstrap';
+import { useQuery } from 'react-query';
+import { mint } from '../utils/util';
+import Loading from './Loading';
+import Notify from './Notify';
 
 const MintPage = () => {
   const [mintAmount, setMintAmounts] = useState(1);
-
   const [currentImgSrc, setCurrentImgSrc] = useState();
   const [currentImgName, setCurrentImgName] = useState();
 
-  const previewImageRef = useRef(null);
+  const { refetch, isLoading, isSuccess, isError, data, error } = useQuery(
+    ['mintNFT', mintAmount, currentImgSrc, currentImgName],
+    () => mint(mintAmount, currentImgName, currentImgSrc),
+    {
+      enabled: false,
+    }
+  );
 
   const handleMint = async () => {
-    if (window.ethereum) {
-      const imageUID = uploadFile();
-
-      if (!imageUID) return alert('No image found');
-
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, abi.abi, signer);
-
-      try {
-        const response = await contract.mint(
-          BigNumber.from(mintAmount),
-          imageUID,
-          {
-            value: ethers.utils.parseEther((0.001 * mintAmount).toString()),
-          }
-        );
-        console.log('Response ', response);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
-
-  const uploadFile = async () => {
-    if (currentImgSrc) {
-      const imageUID = uuidv4();
-
-      const imageRef = ref(storage, `images/${imageUID}`);
-
-      const metadata = {
-        customMetadata: {
-          name: currentImgName,
-        },
-      };
-
-      const snapshot = await uploadString(
-        imageRef,
-        currentImgSrc,
-        'data_url',
-        metadata
-      );
-      console.log('Uploaded', snapshot);
-
-      return imageUID;
-    }
+    await refetch();
   };
 
   const handleImageChange = (imgEvent) => {
@@ -76,6 +35,12 @@ const MintPage = () => {
 
   return (
     <div className="">
+      <Notify
+        isFailed={isError}
+        isSuccess={isSuccess}
+        successMessage={data}
+        failMessage={error}
+      />
       <div className="border-2 rounded-md p-2 text-white">
         <div className="text-xl font-bold text-center">General Info</div>
         <Form>
@@ -93,11 +58,7 @@ const MintPage = () => {
             <Form.Control onChange={handleImageChange} type="file" />
           </Form.Group>
 
-          <Image
-            className="max-h-64"
-            ref={previewImageRef}
-            src={currentImgSrc}
-          />
+          <Image className="max-h-64" src={currentImgSrc} />
         </Form>
       </div>
       <div className="p-2"></div>
@@ -123,6 +84,8 @@ const MintPage = () => {
           </Button>
         </Form>
       </div>
+
+      <Loading isLoading={isLoading} />
     </div>
   );
 };
