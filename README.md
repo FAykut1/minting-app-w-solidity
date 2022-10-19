@@ -20,7 +20,7 @@ npx hardhat run scripts/deploy.js
 
 Save the output contract address to the /src/abi.js
 
-##Start the project
+## Start the project
 
 ```shell
 npm start
