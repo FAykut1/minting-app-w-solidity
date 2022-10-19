@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { abi, contractAddress } from '../abi';
 import { storage } from '../utils/db';
 
+import { Form, Button, Image } from 'react-bootstrap';
+
 const MintPage = () => {
   const [mintAmount, setMintAmounts] = useState(1);
 
@@ -73,50 +75,53 @@ const MintPage = () => {
   };
 
   return (
-    <div className="text-white">
-      <section className="general-info p-4 border rounded">
-        <h1 className="text-3xl font-bold pb-4">General Info</h1>
-        <div className="flex">
-          <div className="flex flex-col justify-evenly items-start">
-            <div className="">
-              <label>Name</label>
-              <span className="p-2"></span>
-              <input
-                className="text-black"
-                type="text"
-                onChange={(e) => setCurrentImgName(e.target.value)}
-              />
-            </div>
-            <input onChange={handleImageChange} type="file" />
-          </div>
-          <div className="">
-            {currentImgSrc ? (
-              <img
-                className="h-24"
-                ref={previewImageRef}
-                src={currentImgSrc}
-                alt="image not loaded"
-              />
-            ) : (
-              <div className="w-24 h-24 bg-black"></div>
-            )}
-          </div>
-        </div>
-      </section>
+    <div className="">
+      <div className="border-2 rounded-md p-2 text-white">
+        <div className="text-xl font-bold text-center">General Info</div>
+        <Form>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Name</Form.Label>
+            <Form.Control
+              onChange={(e) => setCurrentImgName(e.target.value)}
+              type="text"
+              placeholder="Enter NFT name"
+            />
+          </Form.Group>
 
+          <Form.Group className="mb-3" controlId="formBasicPassword">
+            <Form.Label>Upload Image</Form.Label>
+            <Form.Control onChange={handleImageChange} type="file" />
+          </Form.Group>
+
+          <Image
+            className="max-h-64"
+            ref={previewImageRef}
+            src={currentImgSrc}
+          />
+        </Form>
+      </div>
       <div className="p-2"></div>
+      <div className="border-2 rounded-md p-2 text-white">
+        <div className="text-xl font-bold text-center">Mint</div>
+        <Form>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Amount</Form.Label>
+            <Form.Control
+              type="number"
+              placeholder="Enter NFT name"
+              onChange={(e) => setMintAmounts(e.target.value)}
+            />
+          </Form.Group>
 
-      <section className="mint-amount p-4 border rounded">
-        <span>Amount</span>
-        <input
-          className="text-black"
-          type="number"
-          onChange={(e) => setMintAmounts(e.target.value)}
-        />
-      </section>
-
-      <div className="text-xl text-right p-2 hover:text-slate-400">
-        <button onClick={handleMint}>Mint</button>
+          <Button
+            onClick={handleMint}
+            className="mt-2"
+            variant="primary"
+            type="button"
+          >
+            Mint
+          </Button>
+        </Form>
       </div>
     </div>
   );

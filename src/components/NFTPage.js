@@ -6,6 +6,8 @@ import { abi, contractAddress } from '../abi';
 import { storage } from '../utils/db';
 import { getDownloadURL, ref } from 'firebase/storage';
 
+import { Card, Button } from 'react-bootstrap';
+
 const NFTPage = () => {
   const [NFTs, setNFTs] = useState([]);
 
@@ -55,14 +57,29 @@ const NFTPage = () => {
   };
 
   return (
-    <div>
+    <div className="text-white">
       {NFTs.map((v) => (
-        <div key={v.id} className="p-4 border w-36 h-36">
-          <img src={v.src} alt="lol" />
-        </div>
+        // <div key={v.id} className="p-4 border w-36 h-36">
+        //   <img src={v.src} alt="lol" />
+        // </div>
+        <MCard />
       ))}
     </div>
   );
 };
+
+const MCard = (
+  <Card style={{ width: '18rem' }}>
+    <Card.Img variant="top" src="holder.js/100px180" />
+    <Card.Body>
+      <Card.Title>Card Title</Card.Title>
+      <Card.Text>
+        Some quick example text to build on the card title and make up the bulk
+        of the card's content.
+      </Card.Text>
+      <Button variant="primary">Go somewhere</Button>
+    </Card.Body>
+  </Card>
+);
 
 export default NFTPage;
