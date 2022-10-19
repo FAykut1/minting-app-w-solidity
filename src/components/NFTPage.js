@@ -2,41 +2,14 @@ import { Card } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import { fetchOwnedNFTs } from '../utils/util';
 import Loading from './Loading';
+import Notify from './Notify';
 
 const NFTPage = () => {
-  const { isLoading, isError, isSuccess, data, error } = useQuery(
+  const { isLoading, isError, data, error } = useQuery(
     'myNFTs',
     fetchOwnedNFTs,
     { staleTime: 1000 }
   );
-
-  // const getNFTs = async () => {
-  //   if (window.ethereum) {
-  //     const provider = new ethers.providers.Web3Provider(window.ethereum);
-  //     const signer = provider.getSigner();
-  //     const contract = new ethers.Contract(contractAddress, abi.abi, signer);
-
-  //     try {
-  //       const response = await contract.getNFTs();
-
-  //       const nftArray = response.map((v) => v.split(','));
-
-  //       const data = await Promise.all(
-  //         nftArray.map(async (v) => {
-  //           const { metadata, src } = await getImage(v[1]);
-  //           return {
-  //             id: v[0],
-  //             name: metadata.customMetadata.name,
-  //             src,
-  //           };
-  //         })
-  //       );
-  //       setNFTs(data);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  // };
 
   if (data?.length === 0) {
     return (
@@ -45,6 +18,8 @@ const NFTPage = () => {
       </div>
     );
   }
+
+  if (isError) return <Notify isFailed={isError} failMessage={error} />;
 
   return (
     <div className="text-white grid grid-rows-2 grid-cols-4 gap-2">
