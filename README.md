@@ -1,13 +1,29 @@
-# Sample Hardhat Project
+# NFT Minting App
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
+Install all the packages
 
 ```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
+npm install
+```
+
+Start the hardhat localhost server
+
+```shell
 npx hardhat node
+```
+
+Deploy contract to the localhost server
+
+```shell
 npx hardhat run scripts/deploy.js
 ```
+
+Save the output contract address to the src/abi.js
+
+Start the project
+
+```shell
+npm start
+```
+
+Enjoy..
